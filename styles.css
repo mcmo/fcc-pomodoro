@@ -1,0 +1,54 @@
+body {
+  background-color: #199EFF;
+  color: yellow;
+}
+
+h1 {
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-size: 50px;
+  font-weight: bold;
+}
+
+#timer {
+  cursor: pointer;
+  font-size: 90px;
+}
+
+#config {
+  font-size: 24px;
+}
+
+#config .text {
+  font-size: 12px
+}
+
+#config a {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.plus,
+.minus {
+  margin: 10px;
+  padding: 10px;
+  color: white;
+  font-size: 20px;
+}
+
+.noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#myCanvas {
+  height: 128px;
+  width: 300px;
+  position: absolute;
+  border: 1px solid black;
+  margin: auto;
+  z-index: -1;
+}
