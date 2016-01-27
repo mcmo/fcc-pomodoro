@@ -1,114 +1,163 @@
-var interval = false,
-  inSession = true;
+'use strict';
 
-$(function () {
+var Timer = (function () {
 
-  $('.minus').click(function (e) {
-    var target = $(this).next();
-    var newNum = Math.max(Number(target.text()) - 1, 1);
-    $(target).text(newNum);
-    // change timer if session length updated
-    if (target[0].id === 'session') $('#session').trigger('change');
+  $(function () {
+
+    $('#break .minus').click(function () {
+      decreaseTime(this);
+      setActive('#break');
+    });
+
+    $('#break .plus').click(function () {
+      increaseTime(this);
+      setActive('#break');
+    });
+
+    $('#session .minus').click(function () {
+      decreaseTime(this);
+      setActive('#session');
+    });
+
+    $('#session .plus').click(function () {
+      increaseTime(this);
+      setActive('#session');
+    });
+
+    $('#timer').click(function () {
+      timerClicked();
+    });
+
+    init();
+
   });
 
-  $('.plus').click(function (e) {
-    var target = $(this).prev();
-    var newNum = Math.min(Number(target.text()) + 1, 60);
-    $(target).text(newNum);
-    // change timer if session length updated
-    if (target[0].id === 'session') $('#session').trigger('change');
-  });
-
-  $('#timer').click(function (e) {
-    startTimer();
-  });
-
-  $('#session').on('change', function () {
-    if (inSession) {
-      stopTimer();
-      startSession();
+  function setActive(active) {
+    if (!s.interval) {
+      var inactive = active === '#session' ? '#break' : '#session';
+      s.inSession = active === '#session' ? true : false;
+      $(active).addClass('active');
+      $(inactive).removeClass('active');
     }
+  }
+
+  function decreaseTime(self) {
+    if (!s.interval) {
+      var target = $(self).next();
+      var newNum = Math.max(Number(target.text()) - 1, 1);
+      $(target).text(newNum);
+      resetTimer(newNum);
+    }
+  }
+
+  function increaseTime(self) {
+    if (!s.interval) {
+      var target = $(self).prev();
+      var newNum = Math.min(Number(target.text()) + 1, 60);
+      $(target).text(newNum);
+      resetTimer(newNum);
+    }
+  }
+
+  var s = { // settings
+    interval: false,
+    inSession: true,
+    seconds: 60
+  };
+
+  function init() {
+    setActive('#session');
+    circle.update(true);
+  }
+
+  var circle = Circles.create({
+    id: 'timer',
+    radius: 150,
+    value: 0,
+    maxValue: $('#session span').text() * s.seconds,
+    width: 10,
+    text: function (value) {
+      return formatTimeLeft(value, this.getMaxValue());
+    },
+    colors: ['#D3B6C6', '#4B253A'],
+    duration: 0
   });
 
-  $(window).resize(function () {
-    resize();
-  });
+  function resetTimer(max) {
+    circle._maxValue = max * s.seconds;
+    circle._value = 0;
+    circle.update(true);
+  }
 
-});
+  function formatTimeLeft(value, maxValue) {
+    var totalSecLeft = maxValue - value;
 
-function runTimer() {
-  var originalSeconds = inSession ? $('#session').text() * 60 : $('#break').text() * 60;
-  interval = setInterval(function () {
-    var totalSecondsLeft = $('#min').text() * 60 + Number($('#sec').text()) - 1;
-
-    var minLeft = Math.floor(totalSecondsLeft / 60);
-
-    var secLeft = totalSecondsLeft - minLeft * 60;
+    var minLeft = Math.floor(totalSecLeft / s.seconds);
+    var secLeft = totalSecLeft - minLeft * s.seconds;
     if (secLeft < 10) secLeft = '0' + secLeft;
 
-    $('#min').text(minLeft);
-    $('#sec').text(secLeft);
+    return minLeft + ':' + secLeft;
+  }
 
-    var percentDone = (originalSeconds - totalSecondsLeft) / originalSeconds;
-    draw(percentDone);
+  function startTimer() {
+    s.interval = setInterval(function () {
 
-    if (totalSecondsLeft < 1) {
+      circle.update(circle.getValue() + 1)
+      var totalSecondsLeft = circle.getMaxValue() - circle.getValue();
+      if (totalSecondsLeft < 1) {
+        stopTimer();
+        playSound();
+        startOther();
+      }
+    }, 1000);
+  }
+
+  function timerClicked() {
+    if (!s.interval) {
+      startTimer();
+    } else {
       stopTimer();
-      startOther();
     }
-  }, 1000);
-}
-
-function startTimer() {
-  if (!interval) {
-    runTimer();
-  } else {
-    stopTimer();
   }
-}
 
-function stopTimer() {
-  if (interval) {
-    clearInterval(interval);
-    interval = false;
+  function stopTimer() {
+    if (s.interval) {
+      clearInterval(s.interval);
+      s.interval = false;
+    }
   }
-}
 
-function startOther() {
-  // if break or session just ended, start the other
-  if (inSession) {
-    startBreak();
-  } else {
-    startSession();
+  function startOther() {
+    // if break or session just ended, start the other
+    if (s.inSession) {
+      setActive('#break');
+      startBreak();
+    } else {
+      setActive('#session');
+      startSession();
+    }
   }
-}
 
-function startSession() {
-  $('#min').text($('#session').text());
-  $('#sec').text('00');
-  inSession = true;
-  runTimer();
-}
+  function startSession() {
+    resetTimer($('#session span').text());
+    s.inSession = true;
+    startTimer();
+  }
 
-function startBreak() {
-  $('#min').text($('#break').text());
-  $('#sec').text('00');
-  inSession = false;
-  runTimer();
-}
+  function startBreak() {
+    resetTimer($('#break span').text());
+    s.inSession = false;
+    startTimer();
+  }
 
-var c = document.getElementById("myCanvas");
-var ctx = c.getContext("2d");
-ctx.fillStyle = "#CC1814";
-var i = 1;
-resize();
+  function playSound() {
+    document.getElementById('play').play();
+  }
 
-function resize() {
-  c.style.left = ($(window).width() - 300) / 2 + "px";
-}
+  return {
+    timerClicked: timerClicked,
+    circle: circle,
+    resetTimer: resetTimer
+  }
 
-function draw(percentDone) {
-  var pxWidth = percentDone * 300;
-  ctx.clearRect(0, 0, c.width, c.height);
-  ctx.fillRect(0, 0, pxWidth, 200);
-}
+})();

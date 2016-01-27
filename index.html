@@ -14,24 +14,26 @@
     </div>
     <br>
     <div id="config" class="row noselect">
-      <div class="col-sm-3 col-sm-offset-3">
+      <div id="break" class="col-sm-3 col-sm-offset-3">
         <div class="text">BREAK LENGTH</div>
-        <a class="minus">-</a><span id="break">5</span><a class="plus">+</a>
+        <a class="minus">-</a>
+        <span>5</span><a class="plus">+</a>
       </div>
-      <div class="col-sm-3">
+      <div id="session" class="col-sm-3">
         <div class="text">SESSION LENGTH</div>
-        <a class="minus">-</a><span id="session">25</span><a class="plus">+</a>
+        <a class="minus">-</a>
+        <span>25</span><a class="plus">+</a>
       </div>
     </div>
     <br>
-    <canvas id="myCanvas"></canvas>
-    <div id="timer" class="row">
-      <span id="min">0</span>:<span id="sec">05</span>
-    </div>
+    <div class="circle" id="timer"></div>
   </div>
+  <audio id="play" src="http://www.soundjay.com/button/beep-07.wav"></audio>
+  <script src="circles.min.js"></script>
   <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
   <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script src="clock.js"></script>
+
 </body>
 
 </html>

@@ -1,6 +1,6 @@
 body {
-  background-color: #199EFF;
-  color: yellow;
+  background-color: whitesmoke;
+  color: darkblue;
 }
 
 h1 {
@@ -31,7 +31,7 @@ h1 {
 .minus {
   margin: 10px;
   padding: 10px;
-  color: white;
+  color: darkblue;
   font-size: 20px;
 }
 
@@ -51,4 +51,8 @@ h1 {
   border: 1px solid black;
   margin: auto;
   z-index: -1;
+}
+
+.active {
+  color: red;
 }
